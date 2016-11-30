@@ -1,12 +1,10 @@
 local point = 0
 
-
 function Score(pTouche)
   point = point + pTouche
-  print (pTouche)
 end
 
 function AffichageScore()
-    love.graphics.print("Score "..point, 50 ,50)
+    love.graphics.print("Score "..point, 50 ,15, 0, 1.5, 1.5)
 end
 
