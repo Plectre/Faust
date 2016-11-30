@@ -14,6 +14,7 @@ require("CreerSprite")
 require("Heros")
 require("map")
 require("collide")
+require("Score")
 
 -- getWindowMode
 largeur = love.graphics.getWidth()
@@ -26,6 +27,7 @@ l_tirs = {}
 l_sprites = {}
 l_tiles = {}
 l_ennemis = {}
+touche = 0
 
 -- Et un tableau de tuiles un!!!!!
 local n
@@ -46,6 +48,7 @@ function StartGame()
   hauteurHeros = heros.img:getHeight()
   largeurHeros = heros.img:getWidth()
 
+
 end
 
 function AppelTirs(pOrientationTir)
@@ -53,7 +56,7 @@ function AppelTirs(pOrientationTir)
   tir = CreerTir("faux_r", heros.x, (heros.y - hauteurHeros), pOrientationTir)
 
 end
-
+-- *************************************************************************************
 function love.load()
   StartGame()
 end
@@ -69,23 +72,29 @@ function love.update(dt)
     end
   end
   
-  -- gestion collision tir/mechant
-  for t = #l_tirs, 2, -1  do
-    for e = #l_ennemis,1 ,-1 do
+  -- gestion collision tir/ennemi
+  for e = #l_ennemis,1 ,-1 do
+    for t = #l_tirs, 1, -1  do
       local en = l_ennemis[e]
       local tir = l_tirs[t]
       if tir.x >= en.x + en.img:getWidth() -- trop à droite
           or tir.x + tir.img:getWidth() <= en.x -- trop à gauche
           or tir.y >= en.y + en.img:getHeight() -- trop bas
-          or tir.y + tir.img:getHeight() <= en.y then -- trop haut
+          or tir.y + tir.img:getHeight() <= en.y  -- trop haut
+          then
             --print ("a cotés")
       else
-        table.remove(l_tirs, t)
+        --touche = ennemi.valeur
+        en.sup = true
+        if en.supp == true then
+        end
         table.remove(l_ennemis, e)
+        table.remove(l_tirs, t)
+        --tir.supp = true 
+        Score(en.valeur) -- incrementation du score en fonction de l'ennemi
         end
     end
   end
-  
   
   if heros.saut == false then
       heros.poids = pesenteur
@@ -141,7 +150,7 @@ function love.update(dt)
       tir.x= tir.x + 10
   end
     -- Rotation de la faux
-    tir.rot = tir.rot - dt * math.pi/0.5
+    tir.rot = tir.rot - dt * math.pi/0.2
   -- Si le tir sort de l'ecran on le retire de la table l_tirs
     if tir.x >= largeur or tir.x <=0 then
       table.remove(l_tirs, n)
@@ -158,15 +167,15 @@ end
     for n = #l_tirs,1, -1 do
       local tir = l_tirs[n]
       if tir.orientation == 1 then
-        tir.x = tir.x + 10
+        tir.x = tir.x + 15
       else
-        tir.x = tir.x - 10
+        tir.x = tir.x - 15
       end
   -- Rotation de la faux
-  tir.rot = tir.rot - dt * math.pi/0.5
+  tir.rot = tir.rot - dt * math.pi/-0.2
 
   -- Si le tir sort de l'ecran on le retire de la table l_tirs
-    if tir.x >= largeur or tir.x <=0 then
+    if tir.x >= largeur * 2 or tir.x <= 0 - largeur then
       table.remove(l_tirs, n)
       -- on passe la propriete a true afin de tagger le tir
       -- pour l'effacer aussi de la table l_sprites
@@ -180,16 +189,17 @@ end
   for n = #l_sprites,1, -1 do
     if l_sprites[n].supp == true then
       table.remove(l_sprites, n)
-      --tir.supp = true
     end
   end
 end
 
+-- **************************************************************************************
 
 function love.draw()
-  
+
   -- GUI ..............................
   love.graphics.draw(ui_Up, 80, 450, 0, 1, 1,ui_Up:getWidth()/2, ui_Up:getHeight()/2)
+  AffichageScore()
 --...............................................
   -- Dessin du niveau
       local l,c
@@ -207,11 +217,15 @@ function love.draw()
         x = x + 32
       end        
       if n == 2 then
-
-        CreerEnnemis("Plat_2", x, y)
+        CreerEnnemis("Plat_2", x, y, 100)
         niveau[l][c] = "0" -- On remplace l'ennemi par 0 pour ne pas les redessiner à chaque update de draw
         x = x + 32
       end
+      if n == 3 then
+        CreerEnnemis("Plat_3", x, y, 150)
+        niveau[l][c] = "0"
+        x = x + 32
+        end
       if n == 0 then 
           x = x + 32
       end
@@ -228,10 +242,7 @@ end
     local sp
     sp = l_tirs[n]
     love.graphics.draw(sp.img, sp.x, sp.y, sp.rot,1, 1)
-        love.graphics.circle("fill", sp.x, sp.y, 5)
-
   end
-  
   love.graphics.print("tirs = "..#l_tirs.." sprites = "..#l_sprites
     .." Heros = "..#l_heros.." Ennemis = "..#l_ennemis.." Heros.vx :"..heros.vx, 10, 0)
   
@@ -243,8 +254,6 @@ end
     en = l_ennemis[i]
     love.graphics.draw(en.img, en.x, en.y)
     love.graphics.circle("fill", en.x, en.y, 5)
-
-
   end
 
   -- Heros
