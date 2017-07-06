@@ -14,14 +14,14 @@ function CreerSprite(pNmImage, pX, pY)
     return sprite
 end
 
-function CreerTir(pNmImage, pX, pY ,pRot)
+function CreerTir(pNmImage, pX, pY ,pOrien)
   tir = {}
   
   tir.img = love.graphics.newImage("images/"..pNmImage..".png")
   tir.x = pX
   tir.y = pY
   tir.rot = 0
-  tir.orientation = pRot
+  tir.orientation = pOrien
   tir.supp = false
   tir.l = tir.img:getWidth()
   tir.h = tir.img:getHeight()
@@ -31,7 +31,7 @@ function CreerTir(pNmImage, pX, pY ,pRot)
 end
     
 
-function CreerEnnemis(pNmImage, pX, pY)
+function CreerEnnemis(pNmImage, pX, pY, pVal)
     ennemi = {}
     
     ennemi.x = pX
@@ -41,8 +41,9 @@ function CreerEnnemis(pNmImage, pX, pY)
     ennemi.rot = pRot
     ennemi.supp = false
     ennemi.flip = 1
+    ennemi.valeur = pVal
     
     table.insert(l_ennemis, ennemi)
-    table.insert(l_sprites, ennemi)
+    --table.insert(l_sprites, ennemi)
     return ennemi
 end
